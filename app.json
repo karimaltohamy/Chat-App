@@ -6,17 +6,23 @@
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "multiuserchatapp",
-    "userInterfaceStyle": "automatic",
+    "userInterfaceStyle": "dark",
     "newArchEnabled": true,
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.anonymous.multiuserchatapp",
+      "associatedDomains": [
+        "applinks:lasting-mammoth-79.clerk.accounts.dev",
+        "webcredentials:lasting-mammoth-79.clerk.accounts.dev"
+      ]
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "edgeToEdgeEnabled": true
+      "edgeToEdgeEnabled": true,
+      "package": "com.anonymous.multiuserchatapp"
     },
     "web": {
       "bundler": "metro",
@@ -33,7 +39,9 @@
           "resizeMode": "contain",
           "backgroundColor": "#ffffff"
         }
-      ]
+      ],
+      "expo-secure-store",
+      ["expo-build-properties", { "ios": { "deploymentTarget": "16.0" } }]
     ],
     "experiments": {
       "typedRoutes": true
