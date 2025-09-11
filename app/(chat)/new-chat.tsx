@@ -1,7 +1,9 @@
+import BaseLayout from "@/components/BaseLayout";
 import { Button } from "@/components/Button";
 import Input from "@/components/Input";
 import { Switch } from "@/components/Switch";
 import { Text } from "@/components/Text";
+import { Colors, GlassStyles } from "@/constants/colors";
 import { createChatRoom } from "@/supabaseClient";
 import { ChatRoomForm } from "@/utils/types";
 import { useMutation } from "@tanstack/react-query";
@@ -32,51 +34,80 @@ const NewChat = () => {
   });
 
   return (
-    <ScrollView style={{ flex: 1, padding: 20 }}>
-      {/* Title */}
-      <Input
-        label="Title"
-        value={formData.title}
-        onChangeText={(text) => setFormData({ ...formData, title: text })}
-        name="title"
-        placeholder="Enter title"
-      />
-
-      {/* Description */}
-      <Input
-        label="Description"
-        value={formData.description}
-        onChangeText={(text) => setFormData({ ...formData, description: text })}
-        name="description"
-        placeholder="Enter description"
-      />
-
-      {/* isPrivate */}
-      <View
-        style={{
-          flexDirection: "row",
-          alignItems: "center",
-          justifyContent: "space-between",
-        }}
-      >
-        <Text>Private</Text>
-        <Switch
-          value={formData.isPrivate}
-          onValueChange={(val) => setFormData({ ...formData, isPrivate: val })}
+    <BaseLayout>
+      <ScrollView style={{ flex: 1, padding: 20 }}>
+        {/* Title */}
+        <Input
+          label="Title"
+          value={formData.title}
+          onChangeText={(text) => setFormData({ ...formData, title: text })}
+          name="title"
+          placeholder="Enter title"
         />
-      </View>
 
-      <Text style={{ marginTop: 20, fontSize: 16, marginBottom: 20 }}>
-        You can create a new chat room by entering a title and description.
-      </Text>
+        {/* Description */}
+        <Input
+          label="Description"
+          value={formData.description}
+          onChangeText={(text) => setFormData({ ...formData, description: text })}
+          name="description"
+          placeholder="Enter description"
+        />
 
-      <Button
-        onPress={() => createChatRoomMutation(formData)}
-        isLoading={isPending}
-      >
-        Create
-      </Button>
-    </ScrollView>
+        {/* isPrivate */}
+        <View
+          style={{
+            flexDirection: "row",
+            alignItems: "center",
+            justifyContent: "space-between",
+            backgroundColor: Colors.glass.secondary,
+            borderWidth: 1,
+            borderColor: Colors.border.light,
+            borderRadius: 15,
+            padding: 20,
+            marginVertical: 10,
+            ...GlassStyles.shadow,
+          }}
+        >
+          <Text style={{ color: Colors.text.primary, fontSize: 16, fontWeight: "600" }}>
+            Private Room
+          </Text>
+          <Switch
+            value={formData.isPrivate}
+            onValueChange={(val) => setFormData({ ...formData, isPrivate: val })}
+          />
+        </View>
+
+        <View
+          style={{
+            backgroundColor: Colors.glass.secondary,
+            borderWidth: 1,
+            borderColor: Colors.border.light,
+            borderRadius: 15,
+            padding: 20,
+            marginTop: 20,
+            marginBottom: 20,
+            ...GlassStyles.shadow,
+          }}
+        >
+          <Text style={{ 
+            fontSize: 16, 
+            color: Colors.text.secondary,
+            lineHeight: 24,
+            textAlign: "center"
+          }}>
+            Create a new chat room by entering a title and description. Private rooms require invitation to join.
+          </Text>
+        </View>
+
+        <Button
+          onPress={() => createChatRoomMutation(formData)}
+          isLoading={isPending}
+        >
+          Create Chat Room
+        </Button>
+      </ScrollView>
+    </BaseLayout>
   );
 };
 

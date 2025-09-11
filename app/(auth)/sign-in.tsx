@@ -1,6 +1,8 @@
+import BaseLayout from "@/components/BaseLayout";
 import { Button } from "@/components/Button";
 import Input from "@/components/Input";
 import { Text } from "@/components/Text";
+import { Colors, GlassStyles } from "@/constants/colors";
 import { useSignIn } from "@clerk/clerk-expo";
 import { ClerkAPIError } from "@clerk/types";
 import React, { useState } from "react";
@@ -9,7 +11,6 @@ import {
   Image,
   KeyboardAvoidingView,
   Platform,
-  SafeAreaView,
   ScrollView,
   View,
 } from "react-native";
@@ -44,30 +45,49 @@ const SignInWithEmail = () => {
   };
 
   return (
-    <SafeAreaView style={{ flex: 1 }}>
+    <BaseLayout>
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         style={{ flex: 1 }}
       >
         <ScrollView style={{ flex: 1 }}>
-          <View style={{ padding: 16, flex: 1 }}>
-            <View style={{ justifyContent: "center", alignItems: "center" }}>
+          <View style={{ padding: 20, flex: 1 }}>
+            <View
+              style={{
+                justifyContent: "center",
+                alignItems: "center",
+                marginTop: 40,
+              }}
+            >
               <Image
                 source={require("@/assets/images/logo (1).png")}
-                style={{ width: 200, height: 200 }}
+                style={{ width: 150, height: 150 }}
               />
               <Text
-                style={{ fontSize: 32, fontWeight: "bold", marginBottom: 20 }}
+                style={{
+                  fontSize: 28,
+                  fontWeight: "bold",
+                  marginBottom: 10,
+                  color: Colors.text.primary,
+                  textAlign: "center",
+                }}
               >
                 Welcome Back
               </Text>
-              <Text style={{ fontSize: 16 }}>
+              <Text
+                style={{
+                  fontSize: 16,
+                  color: Colors.text.secondary,
+                  textAlign: "center",
+                  marginBottom: 30,
+                }}
+              >
                 Sign in to continue chatting 🚀
               </Text>
             </View>
 
             {/* fields */}
-            <View style={{ gap: 10, marginTop: 20 }}>
+            <View style={{ gap: 15 }}>
               <Input
                 label="Email"
                 value={form.email}
@@ -86,12 +106,47 @@ const SignInWithEmail = () => {
                 secureTextEntry
               />
 
-              <Button onPress={handleSignInWithEmail}>Sign In</Button>
+              <Button
+                onPress={handleSignInWithEmail}
+                style={{
+                  marginTop: 10,
+                  backgroundColor: Colors.glass.primary,
+                  borderWidth: 1,
+                  borderColor: Colors.border.primary,
+                  ...GlassStyles.shadow,
+                }}
+              >
+                <Text
+                  style={{
+                    color: Colors.text.primary,
+                    fontWeight: "600",
+                    margin: "auto",
+                  }}
+                >
+                  Sign In
+                </Text>
+              </Button>
 
               {errors.length > 0 && (
-                <View style={{ marginTop: 10 }}>
+                <View
+                  style={{
+                    marginTop: 15,
+                    backgroundColor: Colors.glass.dark,
+                    borderWidth: 1,
+                    borderColor: "rgba(255, 0, 0, 0.3)",
+                    borderRadius: 12,
+                    padding: 15,
+                  }}
+                >
                   {errors.map((e, i) => (
-                    <Text key={i} style={{ color: "red" }}>
+                    <Text
+                      key={i}
+                      style={{
+                        color: "#FF6B6B",
+                        fontSize: 14,
+                        marginBottom: i < errors.length - 1 ? 5 : 0,
+                      }}
+                    >
                       {e.message}
                     </Text>
                   ))}
@@ -101,7 +156,7 @@ const SignInWithEmail = () => {
           </View>
         </ScrollView>
       </KeyboardAvoidingView>
-    </SafeAreaView>
+    </BaseLayout>
   );
 };
 

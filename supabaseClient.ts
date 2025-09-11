@@ -30,24 +30,28 @@ export async function getAllChatRooms() {
     .select("*")
     .order("created_at", { ascending: false }); // newest first
 
-  console.log("data", data);
-
   if (error) throw error;
   return data as ChatRoom[];
 }
 
 // send message to chat room
-export async function sendMessage(
-  message: Omit<Message, "id" | "createdAt" | "updatedAt">
-) {
+export interface MessageBody {
+  content: string;
+  senderId: string;
+  senderName: string;
+  senderPhoto?: string;
+  chatRoomId: string;
+}
+
+export async function sendMessage(message: MessageBody) {
   const { data, error } = await supabase
     .from("messages")
     .insert({
       content: message.content,
-      sender_id: message.senderId,
-      sender_name: message.senderName,
-      sender_photo: message.senderPhoto,
-      chat_room_id: message.chatRoomId,
+      senderId: message.senderId,
+      senderName: message.senderName,
+      senderPhoto: message.senderPhoto,
+      chatRoomId: message.chatRoomId,
     })
     .select()
     .single();
@@ -61,7 +65,7 @@ export async function getMessages(chatRoomId: string) {
   const { data, error } = await supabase
     .from("messages")
     .select("*")
-    .eq("chat_room_id", chatRoomId)
+    .eq("chatRoomId", chatRoomId)
     .order("created_at", { ascending: true });
 
   if (error) throw error;
@@ -69,7 +73,6 @@ export async function getMessages(chatRoomId: string) {
 }
 
 // Real-Time Message Subscriptions
-
 export function subscribeToMessages(
   chatRoomId: string,
   callback: (msg: Message) => void
@@ -82,7 +85,7 @@ export function subscribeToMessages(
         event: "INSERT",
         schema: "public",
         table: "messages",
-        filter: `chat_room_id=eq.${chatRoomId}`,
+        filter: `chatRoomId=eq.${chatRoomId}`,
       },
       (payload) => {
         callback(payload.new as Message);

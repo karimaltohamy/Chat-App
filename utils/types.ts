@@ -1,4 +1,4 @@
-interface ChatRoom {
+export interface ChatRoom {
   id: string;
   title: string;
   description: string;
@@ -12,10 +12,11 @@ export interface ChatRoomForm {
   description: string;
   isPrivate: boolean;
 }
-interface Message {
-  $id?: string;
-  $createdAt?: string;
-  $updatedAt?: string;
+export interface Message {
+  $id: string;
+  created_at: string;
+  $createdAt: string;
+  $updatedAt: string;
   $collectionId?: string;
   $databaseId?: string;
   $permissions?: any[];
@@ -26,11 +27,10 @@ interface Message {
   chatRoomId: string;
 }
 
-interface User {
+export interface User {
   id: string;
   fullName: string;
   email: string;
   imageUrl: string;
 }
 
-export type { ChatRoom, Message, User };

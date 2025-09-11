@@ -1,4 +1,5 @@
 import { IconSymbol } from "@/components/IconSymbol";
+import { Colors } from "@/constants/colors";
 import { useUser } from "@clerk/clerk-expo";
 import { Link, Redirect, Stack } from "expo-router";
 import React from "react";
@@ -17,6 +18,10 @@ const AppLayout = () => {
         options={{
           headerTitle: "Chat Rooms",
           headerLargeTitle: true,
+          headerStyle: {
+            backgroundColor: Colors.background.middle,
+          },
+
           headerLeft: () => (
             <Link href="/(chat)/profile">
               <Image
@@ -40,6 +45,10 @@ const AppLayout = () => {
           presentation: "modal",
           headerShown: true,
           title: "Profile",
+          headerStyle: {
+            backgroundColor: Colors.background.middle,
+          },
+
           headerLeft: () => (
             <Link href="/" dismissTo>
               <IconSymbol name="chevron.left" />
@@ -53,6 +62,9 @@ const AppLayout = () => {
           presentation: "modal",
           headerShown: true,
           title: "New Chat",
+          headerStyle: {
+            backgroundColor: Colors.background.middle,
+          },
           headerLeft: () => (
             <Link href="/" dismissTo>
               <IconSymbol name="chevron.left" />
@@ -61,10 +73,24 @@ const AppLayout = () => {
         }}
       />
       {/* Set title to empty string to prevent showing [chat] in the header while chat room title is being fetched */}
-      <Stack.Screen name="[chat]" options={{ headerTitle: "" }} />
+      <Stack.Screen
+        name="[chat]"
+        options={{
+          headerTitle: "",
+          headerStyle: {
+            backgroundColor: Colors.background.middle,
+          },
+        }}
+      />
       <Stack.Screen
         name="settings/[chat]"
-        options={{ presentation: "modal", headerTitle: "Room Settings" }}
+        options={{
+          presentation: "modal",
+          headerTitle: "Room Settings",
+          headerStyle: {
+            backgroundColor: Colors.background.middle,
+          },
+        }}
       />
     </Stack>
   );
