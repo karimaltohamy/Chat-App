@@ -1,10 +1,11 @@
+/* eslint-disable import/no-unresolved */
+import { SUPABASE_ANON_KEY } from "@env";
 import { createClient } from "@supabase/supabase-js";
 import "react-native-url-polyfill/auto";
 import { ChatRoom, ChatRoomForm, Message } from "./utils/types";
 
 const supabaseUrl = "https://vxhxstvayhegaftdqqwt.supabase.co";
-const supabaseAnonKey =
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZ4aHhzdHZheWhlZ2FmdGRxcXd0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTcyNDgyODEsImV4cCI6MjA3MjgyNDI4MX0.6kM86F0A94nbXhfDOiGMJOosbQt3ggJX7Q9aVwShAOI";
+const supabaseAnonKey = SUPABASE_ANON_KEY;
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
@@ -26,12 +27,25 @@ export async function createChatRoom(room: ChatRoomForm) {
 
 export async function getAllChatRooms() {
   const { data, error } = await supabase
+
     .from("chatrooms")
     .select("*")
     .order("created_at", { ascending: false }); // newest first
 
   if (error) throw error;
   return data as ChatRoom[];
+}
+
+// get chat room by id
+export async function getChatRoom(chatRoomId: string) {
+  const { data, error } = await supabase
+    .from("chatrooms")
+    .select("*")
+    .eq("id", chatRoomId)
+    .single();
+
+  if (error) throw error;
+  return data as ChatRoom;
 }
 
 // send message to chat room

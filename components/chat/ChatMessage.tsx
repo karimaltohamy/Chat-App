@@ -1,10 +1,10 @@
+import { Colors, GlassStyles } from "@/constants/colors";
 import { getDateLabel } from "@/utils";
 import { Message } from "@/utils/types";
 import { useUser } from "@clerk/clerk-expo";
 import React, { useEffect, useRef } from "react";
 import { Animated, Image, Text, View } from "react-native";
 import DateSeparator from "./DateSeparator";
-import { Colors, GlassStyles } from '@/constants/colors';
 
 interface Props {
   item: Message;
@@ -15,7 +15,7 @@ const ChatMessage: React.FC<Props> = ({ item, previousMessage }) => {
   const { user } = useUser();
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const slideAnim = useRef(new Animated.Value(30)).current;
-  
+
   const showDateSeparator =
     !previousMessage ||
     getDateLabel(item.created_at) !== getDateLabel(previousMessage.created_at);
@@ -79,11 +79,15 @@ const ChatMessage: React.FC<Props> = ({ item, previousMessage }) => {
             }}
           >
             <View style={{ flexShrink: 1 }}>
-              <Text style={{ 
-                color: Colors.text.primary,
-                fontSize: 16,
-                lineHeight: 22
-              }}>{item.content}</Text>
+              <Text
+                style={{
+                  color: Colors.text.primary,
+                  fontSize: 16,
+                  lineHeight: 22,
+                }}
+              >
+                {item.content}
+              </Text>
             </View>
           </View>
         ) : (
@@ -98,46 +102,50 @@ const ChatMessage: React.FC<Props> = ({ item, previousMessage }) => {
               borderRadius: 25,
               alignSelf: "flex-start",
               maxWidth: "90%",
-              marginTop: isGrouped ? 2 : 10,
+              marginTop: isGrouped ? 5 : 25,
               ...GlassStyles.shadow,
               shadowColor: Colors.message.other.glow,
             }}
           >
-          {/* Only show avatar if not grouped */}
-          {!isGrouped && (
-            <Image
-              source={{ uri: item.senderPhoto }}
-              style={{
-                width: 42,
-                height: 42,
-                borderRadius: 21,
-                marginRight: 12,
-                borderWidth: 2,
-                borderColor: Colors.border.light,
-                ...GlassStyles.shadow,
-              }}
-            />
-          )}
-          <View style={{ flexShrink: 1 }}>
-            {/* Only show name if not grouped */}
+            {/* Only show avatar if not grouped */}
             {!isGrouped && (
+              <Image
+                source={{ uri: item.senderPhoto }}
+                style={{
+                  width: 42,
+                  height: 42,
+                  borderRadius: 21,
+                  marginRight: 12,
+                  borderWidth: 2,
+                  borderColor: Colors.border.light,
+                  ...GlassStyles.shadow,
+                }}
+              />
+            )}
+            <View style={{ flexShrink: 1 }}>
+              {/* Only show name if not grouped */}
+              {!isGrouped && (
+                <Text
+                  style={{
+                    fontWeight: "600",
+                    marginBottom: 8,
+                    color: Colors.text.accent,
+                    fontSize: 14,
+                  }}
+                >
+                  {item.senderName}
+                </Text>
+              )}
               <Text
                 style={{
-                  fontWeight: "600",
-                  marginBottom: 8,
-                  color: Colors.text.accent,
-                  fontSize: 14,
+                  color: Colors.text.primary,
+                  fontSize: 16,
+                  lineHeight: 22,
                 }}
               >
-                {item.senderName}
+                {item.content}
               </Text>
-            )}
-            <Text style={{ 
-              color: Colors.text.primary,
-              fontSize: 16,
-              lineHeight: 22
-            }}>{item.content}</Text>
-          </View>
+            </View>
           </View>
         )}
       </Animated.View>

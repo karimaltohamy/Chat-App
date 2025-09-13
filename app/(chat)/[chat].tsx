@@ -2,16 +2,20 @@ import BaseLayout from "@/components/BaseLayout";
 import ChatMessage from "@/components/chat/ChatMessage";
 import MessageSkeleton from "@/components/chat/MessageSkeleton";
 import SendMessage from "@/components/chat/SendMessage";
-import { Text } from "@/components/Text";
-import { Colors, GlassStyles } from "@/constants/colors";
-import { getMessages, subscribeToMessages } from "@/supabaseClient";
-import { dummyMessages } from "@/utils/test-data";
+import { IconSymbol } from "@/components/IconSymbol";
+import { Colors } from "@/constants/colors";
+import {
+  getChatRoom,
+  getMessages,
+  subscribeToMessages,
+} from "@/supabaseClient";
 import { Message } from "@/utils/types";
+import { FlashList, FlashListRef } from "@shopify/flash-list";
 import { useQuery } from "@tanstack/react-query";
+import { Link, Stack } from "expo-router";
 import { useSearchParams } from "expo-router/build/hooks";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
-  FlatList,
   Keyboard,
   KeyboardAvoidingView,
   Platform,
@@ -20,20 +24,40 @@ import {
 } from "react-native";
 
 const Chat = () => {
+  const [firstLoad, setFirstLoad] = useState(true);
   const [params] = useSearchParams();
-  const flatListRef = useRef<FlatList>(null);
+  const flatListRef = useRef<FlashListRef<Message>>(null);
   const [messages, setMessages] = useState<Message[]>([]);
 
-  // get all messages for the chat room
-  const { isLoading } = useQuery({
-    queryKey: ["messages", params[1]],
+  // get chat room by id
+  const { data: chatRoom, isLoading: isLoadingChatRoom } = useQuery({
+    queryKey: ["chatRoom"],
     queryFn: async () => {
-      const res = await getMessages(params[1]);
-
-      setMessages(res);
+      const res = await getChatRoom(params[1]);
+      return res;
     },
     enabled: !!params[1],
   });
+
+  console.log(JSON.stringify(chatRoom, null, 2));
+
+  // get all messages for the chat room
+  const { isLoading } = useQuery({
+    queryKey: ["messages"],
+    queryFn: async () => {
+      const res = await getMessages(params[1]);
+      setMessages(res);
+      return res;
+    },
+    enabled: !!params[1],
+  });
+
+  // if the first load to fetch messages is still loading, show skeletons
+  useEffect(() => {
+    if (!isLoading) {
+      setFirstLoad(false);
+    }
+  }, [isLoading]);
 
   useEffect(() => {
     const chatId = params[1];
@@ -77,79 +101,68 @@ const Chat = () => {
   }, [scrollToBottom]);
 
   return (
-    <BaseLayout>
-      <KeyboardAvoidingView
-        style={{ flex: 1 }}
-        behavior={Platform.OS === "ios" ? "padding" : "height"}
-        keyboardVerticalOffset={
-          Platform.OS === "ios"
-            ? 100
-            : Platform.OS === "android"
-            ? StatusBar.currentHeight || 0
-            : 0
-        }
-      >
-        <View style={{ flex: 1 }}>
-          <FlatList
-            ref={flatListRef}
-            data={isLoading ? dummyMessages : messages || []}
-            keyExtractor={(item) => (isLoading ? item.$id! : item.$id!)}
-            ListHeaderComponent={
-              <View
-                style={{
-                  flexDirection: "row",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  paddingHorizontal: 20,
-                  paddingVertical: 15,
-                  backgroundColor: Colors.glass.secondary,
-                  borderRadius: 25,
-                  marginBottom: 10,
-                  borderWidth: 1,
-                  borderColor: Colors.border.light,
-                  ...GlassStyles.shadow,
-                }}
-              >
-                <Text
-                  style={{
-                    fontSize: 22,
-                    fontWeight: "700",
-                    color: Colors.text.primary,
-                    letterSpacing: 0.5,
-                  }}
-                >
-                  Chat {params[1]}
-                </Text>
-              </View>
-            }
-            contentContainerStyle={{
-              padding: 8,
-              paddingBottom: 20,
-            }}
-            keyboardDismissMode="interactive"
-            keyboardShouldPersistTaps="handled"
-            onContentSizeChange={() => scrollToBottom()}
-            renderItem={({ item, index }) =>
-              isLoading ? (
-                <MessageSkeleton
-                  key={item.$id}
-                  isCurrentUser={index % 3 === 0}
-                />
-              ) : (
-                <ChatMessage
-                  key={item.$id}
-                  item={item}
-                  previousMessage={messages?.[index - 1] || ({} as Message)}
-                />
-              )
-            }
-          />
-        </View>
+    <>
+      <Stack.Screen
+        options={{
+          headerTitle: chatRoom?.title,
+          headerRight: () => (
+            <Link
+              href={{
+                pathname: "/settings/[chat]",
+                params: { chat: params[1] as string },
+              }}
+            >
+              <IconSymbol name="gearshape" size={24} color={Colors.primary} />
+            </Link>
+          ),
+        }}
+      />
+      <BaseLayout>
+        <KeyboardAvoidingView
+          style={{ flex: 1 }}
+          behavior={Platform.OS === "ios" ? "padding" : "height"}
+          keyboardVerticalOffset={
+            Platform.OS === "ios"
+              ? 100
+              : Platform.OS === "android"
+              ? StatusBar.currentHeight || 0
+              : 0
+          }
+        >
+          <View style={{ flex: 1 }}>
+            <FlashList
+              ref={flatListRef}
+              data={messages || []}
+              keyExtractor={(item) => item.$id!}
+              contentContainerStyle={{
+                padding: 8,
+                paddingBottom: 20,
+              }}
+              keyboardDismissMode="interactive"
+              keyboardShouldPersistTaps="handled"
+              onContentSizeChange={() => scrollToBottom()}
+              renderItem={({ item, index }) =>
+                isLoading && firstLoad ? (
+                  <MessageSkeleton
+                    key={item.$id}
+                    isCurrentUser={index % 3 === 0}
+                  />
+                ) : (
+                  <ChatMessage
+                    key={item.$id}
+                    item={item}
+                    previousMessage={messages?.[index - 1] || ({} as Message)}
+                  />
+                )
+              }
+            />
+          </View>
 
-        {/* Fixed Footer - moved inside KeyboardAvoidingView */}
-        <SendMessage onMessageSent={scrollToBottom} />
-      </KeyboardAvoidingView>
-    </BaseLayout>
+          {/* Fixed Footer - moved inside KeyboardAvoidingView */}
+          <SendMessage onMessageSent={scrollToBottom} />
+        </KeyboardAvoidingView>
+      </BaseLayout>
+    </>
   );
 };
 
