@@ -6,7 +6,7 @@ import { Text } from "@/components/Text";
 import { Colors, GlassStyles } from "@/constants/colors";
 import { createChatRoom } from "@/supabaseClient";
 import { ChatRoomForm } from "@/utils/types";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { router } from "expo-router";
 import React, { useState } from "react";
 import { Alert, ScrollView, View } from "react-native";
@@ -17,6 +17,7 @@ const NewChat = () => {
     description: "",
     isPrivate: false,
   });
+  const queryClient = useQueryClient();
 
   const { mutate: createChatRoomMutation, isPending } = useMutation({
     mutationFn: async (data: ChatRoomForm) => {
@@ -25,6 +26,7 @@ const NewChat = () => {
     },
     onSuccess: (data) => {
       Alert.alert("Success!", "Chat room created successfully!");
+      queryClient.invalidateQueries({ queryKey: ["chatRooms"] });
       router.back();
     },
     onError: (error) => {
@@ -49,7 +51,9 @@ const NewChat = () => {
         <Input
           label="Description"
           value={formData.description}
-          onChangeText={(text) => setFormData({ ...formData, description: text })}
+          onChangeText={(text) =>
+            setFormData({ ...formData, description: text })
+          }
           name="description"
           placeholder="Enter description"
         />
@@ -69,12 +73,20 @@ const NewChat = () => {
             ...GlassStyles.shadow,
           }}
         >
-          <Text style={{ color: Colors.text.primary, fontSize: 16, fontWeight: "600" }}>
+          <Text
+            style={{
+              color: Colors.text.primary,
+              fontSize: 16,
+              fontWeight: "600",
+            }}
+          >
             Private Room
           </Text>
           <Switch
             value={formData.isPrivate}
-            onValueChange={(val) => setFormData({ ...formData, isPrivate: val })}
+            onValueChange={(val) =>
+              setFormData({ ...formData, isPrivate: val })
+            }
           />
         </View>
 
@@ -90,13 +102,16 @@ const NewChat = () => {
             ...GlassStyles.shadow,
           }}
         >
-          <Text style={{ 
-            fontSize: 16, 
-            color: Colors.text.secondary,
-            lineHeight: 24,
-            textAlign: "center"
-          }}>
-            Create a new chat room by entering a title and description. Private rooms require invitation to join.
+          <Text
+            style={{
+              fontSize: 16,
+              color: Colors.text.secondary,
+              lineHeight: 24,
+              textAlign: "center",
+            }}
+          >
+            Create a new chat room by entering a title and description. Private
+            rooms require invitation to join.
           </Text>
         </View>
 

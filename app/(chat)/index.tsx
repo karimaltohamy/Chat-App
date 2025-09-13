@@ -1,30 +1,23 @@
-import ChatRoomItem from "@/components/ChatRoomItem";
-import { getAllChatRooms } from "@/supabaseClient";
-import { ChatRoom } from "@/utils/types";
-// import { chatRooms } from "@/utils/test-data";
 import BaseLayout from "@/components/BaseLayout";
+import ChatRoomItem from "@/components/ChatRoomItem";
 import { Colors } from "@/constants/colors";
+import { getAllChatRooms } from "@/supabaseClient";
+import { useQuery } from "@tanstack/react-query";
 import { router } from "expo-router";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { FlatList, RefreshControl, View } from "react-native";
 
 const Home = () => {
-  const [chatRooms, setChatRooms] = useState<ChatRoom[]>([]);
-  const [refreshing, setRefreshing] = useState(false);
+  const [refreshing] = useState(false);
 
-  const handleRefresh = async () => {
-    setRefreshing(true);
-    await getAllChatRooms().then((rooms) => {
-      setChatRooms(rooms);
-      setRefreshing(false);
-    });
-  };
-
-  useEffect(() => {
-    getAllChatRooms().then((rooms) => {
-      setChatRooms(rooms);
-    });
-  }, []);
+  const { data: chatRooms, refetch } = useQuery({
+    queryKey: ["chatRooms"],
+    queryFn: async () => {
+      const res = await getAllChatRooms();
+      return res;
+    },
+    enabled: true,
+  });
 
   return (
     <BaseLayout>
@@ -45,7 +38,7 @@ const Home = () => {
           refreshControl={
             <RefreshControl
               refreshing={refreshing}
-              onRefresh={handleRefresh}
+              onRefresh={refetch}
               tintColor={Colors.primary}
               colors={[Colors.primary]}
             />
