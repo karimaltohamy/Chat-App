@@ -10,7 +10,7 @@ import {
   subscribeToMessages,
 } from "@/supabaseClient";
 import { Message } from "@/utils/types";
-import { FlashList, FlashListRef } from "@shopify/flash-list";
+import { FlashList } from "@shopify/flash-list";
 import { useQuery } from "@tanstack/react-query";
 import { Link, Stack } from "expo-router";
 import { useSearchParams } from "expo-router/build/hooks";
@@ -26,11 +26,11 @@ import {
 const Chat = () => {
   const [firstLoad, setFirstLoad] = useState(true);
   const [params] = useSearchParams();
-  const flatListRef = useRef<FlashListRef<Message>>(null);
+  const flatListRef = useRef<any>(null);
   const [messages, setMessages] = useState<Message[]>([]);
 
   // get chat room by id
-  const { data: chatRoom, isLoading: isLoadingChatRoom } = useQuery({
+  const { data: chatRoom } = useQuery({
     queryKey: ["chatRoom"],
     queryFn: async () => {
       const res = await getChatRoom(params[1]);
@@ -38,8 +38,6 @@ const Chat = () => {
     },
     enabled: !!params[1],
   });
-
-  console.log(JSON.stringify(chatRoom, null, 2));
 
   // get all messages for the chat room
   const { isLoading } = useQuery({
@@ -64,6 +62,8 @@ const Chat = () => {
     if (!chatId) return;
 
     const unsubscribe = subscribeToMessages(chatId, (msg) => {
+      console.log("msg", msg);
+
       setMessages((prev) => [...prev, msg]);
     });
 
@@ -109,7 +109,7 @@ const Chat = () => {
             <Link
               href={{
                 pathname: "/settings/[chat]",
-                params: { chat: params[1] as string },
+                params: { chat: params[1]?.toString() || "" },
               }}
             >
               <IconSymbol name="gearshape" size={24} color={Colors.primary} />
@@ -117,6 +117,7 @@ const Chat = () => {
           ),
         }}
       />
+
       <BaseLayout>
         <KeyboardAvoidingView
           style={{ flex: 1 }}
@@ -133,7 +134,7 @@ const Chat = () => {
             <FlashList
               ref={flatListRef}
               data={messages || []}
-              keyExtractor={(item) => item.$id!}
+              keyExtractor={(item, index) => item?.$id || `message-${index}`}
               contentContainerStyle={{
                 padding: 8,
                 paddingBottom: 20,
@@ -144,12 +145,12 @@ const Chat = () => {
               renderItem={({ item, index }) =>
                 isLoading && firstLoad ? (
                   <MessageSkeleton
-                    key={item.$id}
+                    key={item?.$id || `skeleton-${index}`}
                     isCurrentUser={index % 3 === 0}
                   />
                 ) : (
                   <ChatMessage
-                    key={item.$id}
+                    key={item?.$id || `message-${index}`}
                     item={item}
                     previousMessage={messages?.[index - 1] || ({} as Message)}
                   />

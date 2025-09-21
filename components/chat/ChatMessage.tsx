@@ -86,7 +86,7 @@ const ChatMessage: React.FC<Props> = ({ item, previousMessage }) => {
                   lineHeight: 22,
                 }}
               >
-                {item.content}
+                {item?.content}
               </Text>
             </View>
           </View>
@@ -110,7 +110,7 @@ const ChatMessage: React.FC<Props> = ({ item, previousMessage }) => {
             {/* Only show avatar if not grouped */}
             {!isGrouped && (
               <Image
-                source={{ uri: item.senderPhoto }}
+                source={{ uri: item?.senderPhoto }}
                 style={{
                   width: 42,
                   height: 42,

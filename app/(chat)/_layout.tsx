@@ -9,7 +9,7 @@ const AppLayout = () => {
   const { isSignedIn } = useUser();
   const { user } = useUser();
 
-  if (!isSignedIn) return <Redirect href="/(chat)" />;
+  if (!isSignedIn) return <Redirect href="/(auth)" />;
 
   return (
     <Stack>

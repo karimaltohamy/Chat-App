@@ -13,7 +13,7 @@ const BaseLayout: React.FC<BaseLayoutProps> = ({
   children,
   style,
   showStatusBar = true,
-  backgroundColor = Colors.background.middle,
+  backgroundColor = Colors.background?.middle,
 }) => {
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor }}>
@@ -21,7 +21,7 @@ const BaseLayout: React.FC<BaseLayoutProps> = ({
         <StatusBar barStyle="light-content" backgroundColor={backgroundColor} />
       )}
       <View
-        style={[{ flex: 1, backgroundColor: Colors.background.middle }, style]}
+        style={[{ flex: 1, backgroundColor: Colors.background?.middle }, style]}
       >
         {children}
       </View>

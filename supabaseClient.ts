@@ -1,13 +1,11 @@
-/* eslint-disable import/no-unresolved */
-import { SUPABASE_ANON_KEY } from "@env";
 import { createClient } from "@supabase/supabase-js";
 import "react-native-url-polyfill/auto";
 import { ChatRoom, ChatRoomForm, Message } from "./utils/types";
 
 const supabaseUrl = "https://vxhxstvayhegaftdqqwt.supabase.co";
-const supabaseAnonKey = SUPABASE_ANON_KEY;
+const supabaseAnonKey = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY;
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey);
+export const supabase = createClient(supabaseUrl, supabaseAnonKey!);
 
 // create chat room
 export async function createChatRoom(room: ChatRoomForm) {
